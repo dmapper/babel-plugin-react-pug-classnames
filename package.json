@@ -28,8 +28,8 @@
     "url": "https://github.com/dmapper/babel-plugin-react-pug-classnames"
   },
   "files": [
-    "CHANGELOG.md",
     "index.js",
+    "classnames.js",
     "README.md"
   ],
   "devDependencies": {
