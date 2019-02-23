@@ -28,7 +28,7 @@ This library is intended to be used with modular css ([`react-css-modules`](http
 Modal.Actions.controls.full(className=[color, {isOpened, isClosed}])
 ```
 
-*What we intent that template to do is:*
+*What we intend that template to do is:*
 
 1. to use `Modal.Actions` component
 
@@ -42,7 +42,7 @@ Modal.Actions.controls.full(className=[color, {isOpened, isClosed}])
 
 1. If the first class starts from the Capital letter -- it's considered to be the property of the tag you are calling (in this case it's going to be `.Actions`).
 
-2. The first non-capital class is considered to be the `Element` (BEM). All classes specified in the object/array value of `className` will be prefixed with the `Element` name (in this case it will be `root-`)
+2. The first non-capital class is considered to be the `Element` (BEM). All classes specified in the object/array value of `className` will be prefixed with the `Element` name (in this case it will be `controls-`)
 
 3. All classes which you write through `.` (other than the first Capital class, if it exists) are not modified.
 
@@ -51,11 +51,11 @@ Modal.Actions.controls.full(className=[color, {isOpened, isClosed}])
 ```js
 <Modal.Actions
   className={
-    'root full ' + classnames([
-      'root-' + color,
+    'controls full ' + classnames([
+      'controls-' + color,
       {
-        'root-isOpened': isOpened,
-        'root-isClosed': isClosed
+        'controls-isOpened': isOpened,
+        'controls-isClosed': isClosed
       }
     ])
   }
