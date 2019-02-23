@@ -19,12 +19,12 @@ Add plugin to your babel config right after the `transform-react-pug`:
 
 ```json
 {
-  plugins: [
-    ['transform-react-pug', {
-      classAttribute: 'styleName'
+  "plugins": [
+    ["transform-react-pug", {
+      "classAttribute": "styleName"
     }],
-    ['react-pug-classnames', {
-      classAttribute: 'styleName'
+    ["react-pug-classnames", {
+      "classAttribute": "styleName"
     }]
   ]
 }
