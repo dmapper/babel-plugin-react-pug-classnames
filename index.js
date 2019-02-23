@@ -1,7 +1,8 @@
 var DEFAULT_CLASSNAMES_FUNCTION = 'babel-plugin-react-pug-classnames/classnames'
 
-function isTargetAttr (attribute, targetName = 'className') {
-  return attribute.name.name === targetName
+function isTargetAttr (attribute, classAttribute) {
+  if (!classAttribute) classAttribute = 'className'
+  return attribute.name.name === classAttribute
 }
 
 function isGoodNameForNestedComponent (name) {
@@ -33,7 +34,7 @@ module.exports = (babel) => {
         var classes
         var elementName
 
-        if (!isTargetAttr(JSXAttribute.node, opts.attribute)) return
+        if (!isTargetAttr(JSXAttribute.node, opts.classAttribute)) return
 
         if (t.isStringLiteral(JSXAttribute.node.value)) {
           var classNameValue = JSXAttribute.node.value.value.split(' ')
@@ -112,10 +113,10 @@ module.exports = (babel) => {
 
   return {
     visitor: {
-      JSXElement (JSXElement, { opts }) {
+      JSXElement (JSXElement, params) {
         JSXElement.traverse({
           JSXOpeningElement (JSXOpeningElement) {
-            processClass(JSXOpeningElement, opts)
+            processClass(JSXOpeningElement, params.opts)
           }
         })
       }

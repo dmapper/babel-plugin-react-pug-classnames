@@ -6,9 +6,29 @@ Solves the problem of calling sub-components in `react-pug`
 And also automatically parses the array or object value of `className` (`styleName`)
 and transforms it through `classnames`-like function. Which adds BEM-type naming of modifiers by automatically prefixing all classnames with the Element name.
 
+## Install
+
+It must be installed into the actual dependencies, NOT the devDependencies.
+The reason is that it does classnames processing through a dynamic runtime function which is `require()`'d from the package itself.
+
+```bash
+npm i babel-plugin-react-pug-classnames
+```
+
+Add plugin to your babel config right after the `transform-react-pug`:
+
+```json
+  ['transform-react-pug', {
+    classAttribute: 'styleName'
+  }],
+  ['react-pug-classnames', {
+    classAttribute: 'styleName'
+  }]
+```
+
 ## Options
 
-`attribute` -- name of the attribute to use (for example `styleName`). Default: `className`
+`classAttribute` -- name of the attribute to use (for example `styleName`). Default: `className`
 
 `classnamesFunction` -- classnames function to use to transform the className's object/array value. Default: `babel-plugin-react-pug-classnames/classnames`
 
