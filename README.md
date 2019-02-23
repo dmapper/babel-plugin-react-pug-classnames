@@ -18,12 +18,16 @@ npm i babel-plugin-react-pug-classnames
 Add plugin to your babel config right after the `transform-react-pug`:
 
 ```json
-  ['transform-react-pug', {
-    classAttribute: 'styleName'
-  }],
-  ['react-pug-classnames', {
-    classAttribute: 'styleName'
-  }]
+{
+  plugins: [
+    ['transform-react-pug', {
+      classAttribute: 'styleName'
+    }],
+    ['react-pug-classnames', {
+      classAttribute: 'styleName'
+    }]
+  ]
+}
 ```
 
 ## Options
