@@ -29,7 +29,8 @@
   },
   "files": [
     "index.js",
-    "classnames.js",
+    "prefixedClassnames.js",
+    "classcat.js",
     "README.md"
   ],
   "devDependencies": {
