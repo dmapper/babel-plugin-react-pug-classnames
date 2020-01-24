@@ -1,7 +1,7 @@
-module.exports = function c () {
+exports.c = function c () {
   var name = arguments[0]
   var modifiers = Array.prototype.slice.call(arguments, 1)
-  modifiers = processModifiers(name, modifiers)
+  modifiers = processModifiers(name, modifiers).concat(modifiers)
   return clsx.apply(undefined, modifiers)
 }
 

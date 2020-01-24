@@ -1,4 +1,14 @@
-var DEFAULT_CLASSNAMES_FUNCTION = 'babel-plugin-react-pug-classnames/classnames'
+var DEFAULT_CLASSNAMES_FUNCTION = 'babel-plugin-react-pug-classnames/classcat'
+var LEGACY_CLASSNAMES_FUNCTION = 'babel-plugin-react-pug-classnames/prefixedClassnames'
+
+// DEPRECATED.
+// Legacy classnames prefixing is enabled by default for now.
+// In later versions it will be turned off by default and then removed completely.
+// If you need to provide some kind of BEM-like prefixing or another type
+// of classnames functionality -- specify the classnamesFunction in options
+// which must be a module name with the following code:
+// exports.c = function (name, modifiers) { ... }
+var DEFAULT_SUPPORT_LEGACY = true
 
 function isTargetAttr (attribute, classAttribute) {
   if (!classAttribute) classAttribute = 'className'
@@ -10,17 +20,40 @@ function isGoodNameForNestedComponent (name) {
 }
 
 module.exports = (babel) => {
+  var reqName
+  var hasTransformedClassName
   var t = babel.types
 
-  function generateRequireExpression (elementName, expression, classnamesFunction) {
-    var require = t.callExpression(t.identifier('require'), [
-      t.stringLiteral(classnamesFunction || DEFAULT_CLASSNAMES_FUNCTION)
-    ])
+  function isRequire(node) {
+    return (
+      node &&
+      node.declarations &&
+      node.declarations[0] &&
+      node.declarations[0].init &&
+      node.declarations[0].init.callee &&
+      node.declarations[0].init.callee.name === "require"
+    );
+  }
+
+  function generateRequireExpression (elementName, expression, opts) {
     var callExpression = t.callExpression(
-      require,
+      reqName,
       [t.stringLiteral(elementName), expression]
     )
     return callExpression
+  }
+
+  function generateRequire(name, opts) {
+    var legacy = opts.legacy == null ? DEFAULT_SUPPORT_LEGACY : opts.legacy
+    var classnamesFn = opts.classnamesFunction || (
+      legacy ? LEGACY_CLASSNAMES_FUNCTION : DEFAULT_CLASSNAMES_FUNCTION
+    )
+    var require = t.callExpression(t.identifier('require'), [
+      t.stringLiteral(classnamesFn)
+    ])
+    var cFn = t.memberExpression(require, t.identifier('c'));
+    var d = t.variableDeclarator(name, cFn);
+    return t.variableDeclaration("var", [d]);
   }
 
   function processClass (JSXOpeningElement, opts) {
@@ -69,7 +102,8 @@ module.exports = (babel) => {
               elementName = classes[0]
               // Process only if the styleName value is an object or array
               if (t.isObjectExpression(expr.right) || t.isArrayExpression(expr.right)) {
-                expr.right = generateRequireExpression(elementName, expr.right, opts.classnamesFunction)
+                hasTransformedClassName = true
+                expr.right = generateRequireExpression(elementName, expr.right, opts)
               }
             }
           } else if (t.isArrayExpression(JSXAttribute.node.value.expression)) {
@@ -90,7 +124,8 @@ module.exports = (babel) => {
             if (classes[0]) {
               elementName = classes[0]
               // Process only if the styleName value is an object or array
-              expr = generateRequireExpression(elementName, expr, opts.requireFunction)
+              hasTransformedClassName = true
+              expr = generateRequireExpression(elementName, expr, opts)
             }
 
             var plus = t.binaryExpression('+', t.stringLiteral(classes.join(' ') + ' '), expr)
@@ -112,7 +147,32 @@ module.exports = (babel) => {
   }
 
   return {
+    post() {
+      reqName = null;
+      hasTransformedClassName = null;
+    },
     visitor: {
+      Program: {
+        enter(path, state) {
+          reqName = path.scope.generateUidIdentifier(
+            "classnames"
+          );
+        },
+        exit(path, state) {
+          if (!hasTransformedClassName) {
+            return;
+          }
+
+          const lastImportOrRequire = path
+            .get("body")
+            .filter(p => p.isImportDeclaration() || isRequire(p.node))
+            .pop();
+
+          if (lastImportOrRequire) {
+            lastImportOrRequire.insertAfter(generateRequire(reqName, state.opts));
+          }
+        }
+      },
       JSXElement (JSXElement, params) {
         JSXElement.traverse({
           JSXOpeningElement (JSXOpeningElement) {
