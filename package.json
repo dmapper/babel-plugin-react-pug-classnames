@@ -1,6 +1,6 @@
 {
   "name": "babel-plugin-react-pug-classnames",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "[react-pug] Transform className property using BEM classnames-like function",
   "keywords": [
     "babel",
